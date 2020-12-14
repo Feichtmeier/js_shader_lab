@@ -1,58 +1,67 @@
 import * as THREE from "./three.module.js"
 
-window.addEventListener('load', init)
-let scene
-let camera
-let renderer
-let sceneObjects = []
-let uniforms = {}
+window.addEventListener('load', init);
+
+let scene;
+let camera;
+let renderer;
+let sceneObjects = [];
+let uniforms = {};
+let threeDCrossColorAValue = 0xf9826c;
+let threeDCrossColorBValue = 0xACB6E5;
+let ambientLightColorValue = 0x505050;
 
 function init() {
-  scene = new THREE.Scene()
+  scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
-  camera.position.z = 5
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
 
-  renderer = new THREE.WebGLRenderer()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-  document.body.appendChild(renderer.domElement)
-  addLightningToScene(scene)
-  addBasicCube()
-  addCubeWithVertexAndFragmentShader(1, 1, 3)
-  addCubeWithVertexAndFragmentShader(3, 1, 1)
-  addCubeWithVertexAndFragmentShader(1, 3, 1)
-  // addExperimentalLightCube()
-  animationLoop()
+  document.body.appendChild(renderer.domElement);
+
+  scene.add(new THREE.AmbientLight(ambientLightColorValue));
+  scene.add(createColoredPointLight(0, 0, 0, threeDCrossColorAValue))
+
+  sceneObjects.push(createSimpleCubeToPosition(-2));
+  sceneObjects.push(createBoxWithShadersToPosition(1, 1, 3, 2));
+  sceneObjects.push(createBoxWithShadersToPosition(3, 1, 1, 2));
+  sceneObjects.push(createBoxWithShadersToPosition(1, 3, 1, 2));  
+
+  sceneObjects.forEach(object => {
+    scene.add(object);
+  });
+
+  animationLoop(camera);
 
 }
 
-function addLightningToScene(scene) {
-  let pointLight = new THREE.PointLight(0x3a2c11)
-  pointLight.position.set(0, 0, 0)
-  scene.add(pointLight)
+function createColoredPointLight(x, y, z, color) {
+  let pointLight = new THREE.PointLight(color);
+  pointLight.position.set(x, y, z);
 
-  let ambientLight = new THREE.AmbientLight(0x505050)
-  scene.add(ambientLight)
+  return pointLight;
 }
 
-function addPointLightToPosition(x, y, z) {
-  let pointLight = new THREE.PointLight(0x3a2c11)
-  pointLight.position.set(x, y, z)
-  scene.add(pointLight)
+function createSimpleCubeToPosition(position) {
+  let geometry = new THREE.BoxGeometry(1, 1, 1);
+  let material = new THREE.MeshLambertMaterial();
+
+  let mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = position;
+
+  return mesh;
 }
 
-function addBasicCube() {
-  let geometry = new THREE.BoxGeometry(1, 1, 1)
-  let material = new THREE.MeshLambertMaterial()
+function createMeshToPosition(mesh, position) {
+  mesh.position.x = position;
 
-  let mesh = new THREE.Mesh(geometry, material)
-  mesh.position.x = -2
-  scene.add(mesh)
-  sceneObjects.push(mesh)
+  return mesh;
 }
 
-function vertexShader() {
+function createVertexShader() {
   return `
     varying vec3 vUv; 
     varying vec4 modelViewPosition; 
@@ -67,7 +76,7 @@ function vertexShader() {
   `
 }
 
-function fragmentShader() {
+function createFragmentShader() {
   return `
       uniform vec3 colorA; 
       uniform vec3 colorB; 
@@ -79,25 +88,25 @@ function fragmentShader() {
   `
 }
 
-function addCubeWithVertexAndFragmentShader(xLength, yLength, zLength) {
-  uniforms.colorA = { type: 'vec3', value: new THREE.Color(0xf9826c) }
-  uniforms.colorB = { type: 'vec3', value: new THREE.Color(0xACB6E5) }
+function createBoxWithShadersToPosition(xLength, yLength, zLength, position) {
+  uniforms.colorA = { type: 'vec3', value: new THREE.Color(threeDCrossColorAValue) };
+  uniforms.colorB = { type: 'vec3', value: new THREE.Color(threeDCrossColorBValue) };
 
-  let geometry = new THREE.BoxGeometry(xLength, yLength, zLength)
+  let geometry = new THREE.BoxGeometry(xLength, yLength, zLength);
   let material = new THREE.ShaderMaterial({
     uniforms: uniforms,
-    fragmentShader: fragmentShader(),
-    vertexShader: vertexShader(),
-  })
+    fragmentShader: createFragmentShader(),
+    vertexShader: createVertexShader(),
+  });
 
-  let mesh = new THREE.Mesh(geometry, material)
-  mesh.position.x = 2
-  scene.add(mesh)
-  sceneObjects.push(mesh)
+  let mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = position;
+
+  return mesh;
 }
 
 function animationLoop() {
-  renderer.render(scene, camera)
+  renderer.render(scene, camera);
 
   for (let object of sceneObjects) {
     // smaller values make it rotate slower on the x / y axis
@@ -105,5 +114,5 @@ function animationLoop() {
     object.rotation.y += 0.0003
   }
 
-  requestAnimationFrame(animationLoop)
+  requestAnimationFrame(animationLoop);
 }
