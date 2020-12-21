@@ -6,9 +6,9 @@ let scene;
 let camera;
 let renderer;
 let sceneObjects = [];
-let uniforms = {};
+let myUniforms = {};
 let threeDCrossColorAValue = 0xf9826c;
-let threeDCrossColorBValue = 0xACB6E5;
+let threeDCrossColorBValue = 0x0096ea;
 let ambientLightColorValue = 0x505050;
 
 function init() {
@@ -47,7 +47,16 @@ function createColoredPointLight(x, y, z, color) {
 
 function createSimpleCubeToPosition(position) {
   let geometry = new THREE.BoxGeometry(1, 1, 1);
-  let material = new THREE.MeshLambertMaterial();
+  // let material = new THREE.MeshLambertMaterial({
+  //   color: 0x0096ea,
+  //   emissive: 0x0016ea
+  // });
+  let material = new THREE.MeshNormalMaterial( {
+    // color: 0x0096ea,
+    transparent: true,
+    opacity: 0.9,
+    wireframe: true
+  });
 
   let mesh = new THREE.Mesh(geometry, material);
   mesh.position.x = position;
@@ -61,17 +70,19 @@ function createMeshToPosition(mesh, position) {
   return mesh;
 }
 
+// normal and position are attributes of each vertex (point) in the pipeline
 function createVertexShader() {
   return `
+    // varying – used for interpolated data 
+    // between a vertex shader and a fragment shader.
+    // Available for writing in the vertex shader, and read-only in a fragment shader. See Varying section.
     varying vec3 vUv; 
-    varying vec4 modelViewPosition; 
-    varying vec3 vecNormal;
 
     void main() {
       vUv = position; 
-      vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-      vecNormal = (modelViewMatrix * vec4(normal, 0.0)).xyz; //????????
-      gl_Position = projectionMatrix * modelViewPosition; 
+
+      // default shader
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
     }
   `
 }
@@ -83,18 +94,22 @@ function createFragmentShader() {
       varying vec3 vUv;
 
       void main() {
+        // gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
         gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
       }
   `
 }
 
 function createBoxWithShadersToPosition(xLength, yLength, zLength, position) {
-  uniforms.colorA = { type: 'vec3', value: new THREE.Color(threeDCrossColorAValue) };
-  uniforms.colorB = { type: 'vec3', value: new THREE.Color(threeDCrossColorBValue) };
+  myUniforms.colorA = { type: 'vec3', value: new THREE.Color(threeDCrossColorAValue) };
+  myUniforms.colorB = { type: 'vec3', value: new THREE.Color(threeDCrossColorBValue) };
 
-  let geometry = new THREE.BoxGeometry(xLength, yLength, zLength);
+  // let geometry = new THREE.BoxGeometry(xLength, yLength, zLength);
+  let geometry = new THREE.SphereGeometry(1.3, 50, 50);
+  
+  // let geometry = new THREE.PlaneBufferGeometry(20,20,100,100)
   let material = new THREE.ShaderMaterial({
-    uniforms: uniforms,
+    uniforms: myUniforms,
     fragmentShader: createFragmentShader(),
     vertexShader: createVertexShader(),
   });
