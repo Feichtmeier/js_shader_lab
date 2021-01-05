@@ -1,25 +1,31 @@
 import * as THREE from "./three.module.js"
 
-window.addEventListener('load', init);
+var scene,
+  camera,
+  renderer,
+  sceneObjects = [],
+  myUniforms = {},
+  start = Date.now(),
+  fov = 30;
 
-let scene;
-let camera;
-let renderer;
-let sceneObjects = [];
-let myUniforms = {};
+window.addEventListener('load', init);
 
 function init() {
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
+  camera = new THREE.PerspectiveCamera(
+    fov,
+    window.innerWidth / window.innerHeight,
+    1,
+    10000
+  );
+  camera.position.z = 100;
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
 
-  scene.add(new THREE.AmbientLight(0x505050));
-
-  sceneObjects.push(createGradientMeshToPosition(0xf9826c, 0x0096ea, new THREE.SphereGeometry(1.3, 50, 50), 0));
+  sceneObjects.push(createGradientMeshToPosition(0xf9826c, 0x0096ea, new THREE.SphereGeometry(10, 50, 50), 0));
 
   sceneObjects.forEach(object => {
     scene.add(object);
@@ -27,7 +33,17 @@ function init() {
 
   animationLoop(camera);
 
+  onWindowResize();
+  window.addEventListener('resize', onWindowResize);
   document.getElementById('gradient').appendChild(renderer.domElement);
+
+}
+
+function onWindowResize() {
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
 
 }
 
@@ -64,7 +80,7 @@ function createFragmentShaderForGradient() {
 function createGradientMeshToPosition(colorAValue, colorBValue, geometry, position, effectType) {
   myUniforms.colorA = { type: 'vec3', value: new THREE.Color(colorAValue) };
   myUniforms.colorB = { type: 'vec3', value: new THREE.Color(colorBValue) };
-  
+
   let material = new THREE.ShaderMaterial({
     uniforms: myUniforms,
     fragmentShader: createFragmentShaderForGradient(),

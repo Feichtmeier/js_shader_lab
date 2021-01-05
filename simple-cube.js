@@ -1,21 +1,30 @@
 import * as THREE from "./three.module.js"
 
-window.addEventListener('load', init);
+var scene,
+    camera,
+    renderer,
+    sceneObjects = [],
+    myUniforms = {},
+    start = Date.now(),
+    fov = 30;
 
-let scene;
-let camera;
-let renderer;
-let sceneObjects = [];
+window.addEventListener('load', init);
 
 function init() {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 4;
+
+    camera = new THREE.PerspectiveCamera(
+        fov,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000
+    );
+    camera.position.z = 100;
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-    sceneObjects.push(createSimpleMeshToPosition(new THREE.BoxGeometry(1, 1, 1), 0));
+    renderer.setPixelRatio(window.devicePixelRatio);
+    sceneObjects.push(createSimpleMeshToPosition(new THREE.BoxGeometry(10, 10, 10), 0));
 
     sceneObjects.forEach(object => {
         scene.add(object);
@@ -23,7 +32,18 @@ function init() {
 
     animationLoop(camera);
 
+    onWindowResize();
+    window.addEventListener('resize', onWindowResize);
+
     document.getElementById('simple-cube').appendChild(renderer.domElement);
+}
+
+function onWindowResize() {
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
 }
 
 function createSimpleMeshToPosition(geometry, position) {
@@ -46,8 +66,8 @@ function animationLoop() {
 
     for (let object of sceneObjects) {
         // smaller values make it rotate slower on the x / y axis
-        object.rotation.x += 0.0155
-        object.rotation.y += 0.0003
+        object.rotation.x += 0.03
+        object.rotation.y += 0.03
     }
 
     requestAnimationFrame(animationLoop);
