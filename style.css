@@ -1,11 +1,15 @@
-/* CSS files add styling rules to your content */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
     font-family: 'Courier New', Courier, monospace;
-    color: white;
+    color: #f7f7f7;
     margin: 0;
     padding: 0;
-    background-color: black; 
+    background-color: #1a1a1a; 
     text-align: center;
   }
   
