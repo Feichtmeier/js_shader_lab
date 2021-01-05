@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Shader Test</title>
-    <meta charset="utf-8">
-    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="/style.css">
-	<link rel="icon" href="icons/favicon.ico?">
-  </head>  
-  <body>
-	<h1>CUBES</h1>
-    <script type="module" src="main.js" defer></script>
-  </body>
+
+<head>
+  <title>Shader playground</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="icon" href="icons/favicon.ico?">
+</head>
+
+<body>
+  <h2 id="simple-cube">Simple Cube</h2>
+  <h2 id="gradient">Gradient via custom shaders</h2>
+  <h2 id="explosion">Explosion with custom shader</h2>
+
+
+  <script type="module" src="simple-cube.js" defer></script>
+  <script type="module" src="gradient.js" defer></script>
+  <script type="module" src="explosion.js" defer></script>
+</body>
+
 </html>
