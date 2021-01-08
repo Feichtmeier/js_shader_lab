@@ -4,8 +4,6 @@ var scene,
     camera,
     renderer,
     sceneObjects = [],
-    myUniforms = {},
-    start = Date.now(),
     fov = 30;
 
 window.addEventListener('load', init);
