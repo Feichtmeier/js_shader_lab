@@ -3,10 +3,7 @@ import * as THREE from "./three.module.js"
 var scene,
   camera,
   renderer,
-  sceneObjects = [],
-  myUniforms = {},
-  start = Date.now(),
-  fov = 30;
+  sceneObjects = [];
 
 window.addEventListener('load', init);
 
@@ -14,7 +11,7 @@ function init() {
   scene = new THREE.Scene();
 
   camera = new THREE.PerspectiveCamera(
-    fov,
+    30,
     window.innerWidth / window.innerHeight,
     1,
     10000
@@ -78,6 +75,7 @@ function createFragmentShaderForGradient() {
 }
 
 function createGradientMeshToPosition(colorAValue, colorBValue, geometry, position, effectType) {
+  var myUniforms = {};
   myUniforms.colorA = { type: 'vec3', value: new THREE.Color(colorAValue) };
   myUniforms.colorB = { type: 'vec3', value: new THREE.Color(colorBValue) };
 
