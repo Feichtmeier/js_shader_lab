@@ -74,7 +74,7 @@ function createFragmentShaderForGradient() {
   `
 }
 
-function createGradientMeshToPosition(colorAValue, colorBValue, geometry, position, effectType) {
+function createGradientMeshToPosition(colorAValue, colorBValue, geometry, position) {
   var myUniforms = {};
   myUniforms.colorA = { type: 'vec3', value: new THREE.Color(colorAValue) };
   myUniforms.colorB = { type: 'vec3', value: new THREE.Color(colorBValue) };
