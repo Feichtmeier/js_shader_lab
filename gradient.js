@@ -53,7 +53,7 @@ function createVertexShaderForGradient() {
     varying vec3 vUv; 
 
     void main() {
-      vUv = position; 
+      vUv = sin(position); 
 
       // default shader
       gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
@@ -69,7 +69,7 @@ function createFragmentShaderForGradient() {
 
       void main() {
         // gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-        gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
+        gl_FragColor = vec4(mix(colorA, colorB, vUv.z * vUv.x), 1.0);
       }
   `
 }
@@ -83,7 +83,7 @@ function createGradientMeshToPosition(colorAValue, colorBValue, geometry, positi
     uniforms: myUniforms,
     fragmentShader: createFragmentShaderForGradient(),
     vertexShader: createVertexShaderForGradient(),
-    wireframe: true
+    wireframe: false
   });
 
   let mesh = new THREE.Mesh(geometry, material);

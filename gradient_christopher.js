@@ -22,7 +22,7 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
 
-  sceneObjects.push(createGradientMeshToPosition(0xf9826c, 0x0096ea, new THREE.SphereGeometry(10, 50, 50), 0));
+  sceneObjects.push(createGradientMeshToPosition(0x000000, 0x0043ea, new THREE.SphereGeometry(10, 50, 50), 0));
 
   sceneObjects.forEach(object => {
     scene.add(object);
@@ -53,10 +53,10 @@ function createVertexShaderForGradient() {
     varying vec3 vUv; 
 
     void main() {
-      vUv = position; 
+      vUv = tan(position);
 
       // default shader
-      gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+      gl_Position = projectionMatrix * modelViewMatrix * vec4( tan(sin(position)), 0.2 );
     }
   `
 }
@@ -69,7 +69,7 @@ function createFragmentShaderForGradient() {
 
       void main() {
         // gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
-        gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
+        gl_FragColor = vec4(mix(colorA, colorB, vUv.x), 3.0);
       }
   `
 }
@@ -97,8 +97,8 @@ function animationLoop() {
 
   for (let object of sceneObjects) {
     // smaller values make it rotate slower on the x / y axis
-    object.rotation.x += 0.0155
-    object.rotation.y += 0.0003
+    object.rotation.x += 0.255
+    object.rotation.y += 0.2003
   }
 
   requestAnimationFrame(animationLoop);
